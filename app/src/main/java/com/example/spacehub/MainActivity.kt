@@ -1,20 +1,26 @@
 package com.example.spacehub
 
+import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalTextInputService
@@ -29,7 +35,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import java.io.IOException
 import java.time.LocalDate
-import java.time.YearMonth
+import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -54,53 +60,102 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
     @Composable
     fun NotificationsList() {
-        var startDate by remember { mutableStateOf("") }
-        var endDate by remember { mutableStateOf("") }
-        var notificationType by remember { mutableStateOf("") }
-        var result by remember { mutableStateOf("Loading...") }
+        var startDate by remember { mutableStateOf(LocalDate.now()) }
+        var endDate by remember { mutableStateOf(LocalDate.now()) }
+        var notificationType by remember { mutableStateOf("all") } // Default to "all"
+        var result by remember { mutableStateOf("") }
         var notificationsList by remember { mutableStateOf<List<Notification>?>(null) }
 
         val context = LocalContext.current
-        val keyboardController = LocalSoftwareKeyboardController.current
         val coroutineScope = rememberCoroutineScope()
+
+        val notificationTypeOptions = listOf("all", "FLR", "SEP", "CME", "IPS", "MPC", "GST", "RBE", "report")
+        var expanded by remember { mutableStateOf(false) }
+
+        var selectedNotificationType by remember { mutableStateOf("Select Notification Type") }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Start Date input
-            TextField(
-                value = startDate,
-                onValueChange = { startDate = it },
-                label = { Text("Enter Start Date (yyyy-MM-dd)") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            )
+            // Button to show Start Date DatePickerDialog
+            Button(
+                onClick = {
+                    showDatePickerDialog(context = context, initialDate = startDate) {
+                        startDate = it
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Select Start Date")
+            }
 
-            // End Date input
-            TextField(
-                value = endDate,
-                onValueChange = { endDate = it },
-                label = { Text("Enter End Date (yyyy-MM-dd)") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            )
+            // Display selected start date
+            Text("Selected Start Date: ${startDate.toString()}")
 
-            // Notification Type input
-            TextField(
-                value = notificationType,
-                onValueChange = { notificationType = it },
-                label = { Text("Enter Notification Type") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Button to show End Date DatePickerDialog
+            Button(
+                onClick = {
+                    showDatePickerDialog(context = context, initialDate = endDate) {
+                        endDate = it
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Select End Date")
+            }
+
+            // Display selected end date
+            Text("Selected End Date: ${endDate.toString()}")
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Notification Type dropdown
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
-            )
+                    .background(color = Color.Gray, shape = MaterialTheme.shapes.medium)
+                    .clickable { expanded = !expanded }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Text(selectedNotificationType, color = Color.White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    notificationTypeOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(option)
+                            },
+                            onClick = {
+                                notificationType = option
+                                expanded = false
+                                selectedNotificationType = "Selected Notification Type: $notificationType"
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Display selected notification type
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(selectedNotificationType, color = Color.White)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -111,7 +166,7 @@ class MainActivity : ComponentActivity() {
 
                     coroutineScope.launch {
                         try {
-                            notificationsList = runNotificationsFetch(startDate, endDate, notificationType, apiKey)
+                            notificationsList = runNotificationsFetch(startDate.toString(), endDate.toString(), notificationType, apiKey)
                             result = if (notificationsList != null) {
                                 "Notifications fetched successfully"
                             } else {
@@ -212,4 +267,28 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+    // Function to show DatePickerDialog
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun showDatePickerDialog(
+        context: Context,
+        initialDate: LocalDate,
+        onDateSelected: (LocalDate) -> Unit
+    ) {
+        val calendar = Calendar.getInstance()
+        calendar.set(initialDate.year, initialDate.monthValue - 1, initialDate.dayOfMonth)
+
+        val datePickerDialog = DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                val selectedDate = LocalDate.of(year, month + 1, day)
+                onDateSelected(selectedDate)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+
+        datePickerDialog.show()
+    }
 }
