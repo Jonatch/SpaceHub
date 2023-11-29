@@ -27,8 +27,8 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NotificationsList() {
-    var startDate by remember { mutableStateOf(LocalDate.now()) }
-    var endDate by remember { mutableStateOf(LocalDate.now()) }
+    var startDate by remember { mutableStateOf<LocalDate?>(null) }
+    var endDate by remember { mutableStateOf<LocalDate?>(null) }
     var notificationType by remember { mutableStateOf("all") } // Default to "all"
     var result by remember { mutableStateOf("") }
     var notificationsList by remember { mutableStateOf<List<SpaceNotification>?>(null) }
@@ -49,34 +49,36 @@ fun NotificationsList() {
         // Button to show Start Date DatePickerDialog
         Button(
             onClick = {
-                showDatePickerDialog(context = context, initialDate = startDate) {
+                showDatePickerDialog(context = context, initialDate = startDate ?: LocalDate.now()) {
                     startDate = it
+                    // Reset end date if it is before the new start date
+                    if (endDate != null && endDate!! < startDate!!) {
+                        endDate = null
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Select Start Date")
+            Text(if (startDate != null) "Start Date: ${startDate.toString()}" else "Select Start Date")
         }
-
-        // Display selected start date
-        Text("Selected Start Date: ${startDate.toString()}")
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Button to show End Date DatePickerDialog
         Button(
             onClick = {
-                showDatePickerDialog(context = context, initialDate = endDate) {
+                showDatePickerDialog(context = context, initialDate = endDate ?: LocalDate.now()) {
                     endDate = it
+                    // Reset start date if it is after the new end date
+                    if (startDate != null && endDate!! < startDate!!) {
+                        startDate = null
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Select End Date")
+            Text(if (endDate != null) "End Date: ${endDate.toString()}" else "Select End Date")
         }
-
-        // Display selected end date
-        Text("Selected End Date: ${endDate.toString()}")
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -129,20 +131,25 @@ fun NotificationsList() {
         // Button click handling
         Button(
             onClick = {
-                val apiKey = "PzCNkrm4dtZGYZS4EyBajyzbFROa4hbM109iqME5" // Replace with your actual API key
+                // Check if both start and end dates are selected and end date is not before start date
+                if (startDate != null && endDate != null && endDate!! >= startDate!!) {
+                    val apiKey = "PzCNkrm4dtZGYZS4EyBajyzbFROa4hbM109iqME5" // Replace with your actual API key
 
-                coroutineScope.launch {
-                    try {
-                        // Update the function call to use SpaceNotification instead of Notification
-                        notificationsList = runNotificationsFetch(startDate.toString(), endDate.toString(), notificationType, apiKey)
-                        result = if (notificationsList != null) {
-                            "Notifications fetched successfully"
-                        } else {
-                            "Error fetching notifications"
+                    coroutineScope.launch {
+                        try {
+                            // Update the function call to use SpaceNotification instead of Notification
+                            notificationsList = runNotificationsFetch(startDate.toString(), endDate.toString(), notificationType, apiKey)
+                            result = if (notificationsList != null) {
+                                "Notifications fetched successfully"
+                            } else {
+                                "Error fetching notifications"
+                            }
+                        } catch (e: Exception) {
+                            result = "Error: ${e.message ?: "Unknown error"}"
                         }
-                    } catch (e: Exception) {
-                        result = "Error: ${e.message ?: "Unknown error"}"
                     }
+                } else {
+                    result = "Please select both valid start and end dates"
                 }
             },
             modifier = Modifier.fillMaxWidth()
