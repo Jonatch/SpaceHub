@@ -16,51 +16,82 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.spacehub.R
+import com.example.spacehub.ui.theme.SpaceHubColorPalette
+import com.example.spacehub.ui.theme.SpaceHubTheme
+import com.example.spacehub.ui.theme.StarryBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+// In the EventDetailScreen file
 @Composable
 fun EventDetailScreen() {
     // Use a list to store the names of all events
     val eventNames = remember {
-        listOf("FLR", "SEP", "CME", "GST", "IPS", "MPC", "RBE", "report") // Add more event names as needed
+        listOf(
+            "FLR",
+            "SEP",
+            "CME",
+            "GST",
+            "IPS",
+            "MPC",
+            "RBE",
+            "report"
+        ) // Add more event names as needed
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Space Events") },
-                navigationIcon = {
-                    IconButton(onClick = { /* Handle back navigation */ }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+    SpaceHubTheme {
+        Scaffold( modifier = Modifier.background(Color.Black),
+            topBar = {
+                TopAppBar(
+                    title = { Text("Space Events", color = MaterialTheme.colorScheme.primary) },
+                    navigationIcon = {
+                        IconButton(onClick = { /* Handle back navigation */ }) {
+                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { /* Handle info action */ }) {
+                            Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                        }
                     }
-                },
-                actions = {
-                    IconButton(onClick = { /* Handle info action */ }) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                )
+            }
+
+        )
+        {
+            // Use LazyColumn with StarryBackground
+            LazyColumn(
+                modifier = Modifier
+                    .paint(painterResource(id = R.drawable.night_background), contentScale = ContentScale.FillBounds)
+                    .background(Color.Transparent)
+                    .padding(16.dp)
+            ) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                     }
                 }
-            )
-        }
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            items(eventNames) { eventName ->
-                // Display details for each event in the list within a card
-                EventDetails(eventName)
-                Spacer(modifier = Modifier.height(16.dp))
+                items(eventNames) { eventName ->
+                    // Display details for each event in the list within a card
+                    EventDetails(eventName)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }
 }
+
+
 
 @Composable
 fun EventDetails(eventName: String) {
@@ -70,7 +101,6 @@ fun EventDetails(eventName: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
             .clip(RoundedCornerShape(8.dp))
     ) {
         Column(
@@ -85,6 +115,7 @@ fun EventDetails(eventName: String) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
+                        .background(Color.Transparent)
                         .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
                 )
@@ -95,7 +126,7 @@ fun EventDetails(eventName: String) {
             // Display event name
             Text(
                 text = eventName,
-//                style = SpaceHubTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.Start)
             )
@@ -105,7 +136,7 @@ fun EventDetails(eventName: String) {
             // Display event description
             Text(
                 text = getEventExplanation(eventName),
-//                style = SpaceHubTheme.typography.body1,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .align(Alignment.Start)
             )
