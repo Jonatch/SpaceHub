@@ -3,6 +3,7 @@ package com.example.spacehub.screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.spacehub.R
 import com.example.spacehub.ui.theme.SpaceHubColorPalette
 import com.example.spacehub.ui.theme.SpaceHubTheme
@@ -30,9 +32,8 @@ import com.example.spacehub.ui.theme.StarryBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-// In the EventDetailScreen file
 @Composable
-fun EventDetailScreen() {
+fun EventDetailScreen(navController: NavController) {
     // Use a list to store the names of all events
     val eventNames = remember {
         listOf(
@@ -43,17 +44,18 @@ fun EventDetailScreen() {
             "IPS",
             "MPC",
             "RBE",
-            "report"
+            "Report"
         ) // Add more event names as needed
     }
 
     SpaceHubTheme {
-        Scaffold( modifier = Modifier.background(Color.Black),
+        Scaffold(
+            modifier = Modifier.background(Color.Black),
             topBar = {
                 TopAppBar(
                     title = { Text("Space Events", color = MaterialTheme.colorScheme.primary) },
                     navigationIcon = {
-                        IconButton(onClick = { /* Handle back navigation */ }) {
+                        IconButton(onClick = { navController.navigateUp() }) {
                             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                         }
                     },
@@ -64,7 +66,6 @@ fun EventDetailScreen() {
                     }
                 )
             }
-
         )
         {
             // Use LazyColumn with StarryBackground
@@ -72,7 +73,7 @@ fun EventDetailScreen() {
                 modifier = Modifier
                     .paint(painterResource(id = R.drawable.night_background), contentScale = ContentScale.FillBounds)
                     .background(Color.Transparent)
-                    .padding(16.dp)
+                    .padding(top = 72.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             ) {
                 item {
                     Box(
@@ -83,7 +84,10 @@ fun EventDetailScreen() {
                 }
                 items(eventNames) { eventName ->
                     // Display details for each event in the list within a card
-                    EventDetails(eventName)
+                    EventDetails(eventName) {
+                        // Navigate to detail screen when clicked
+                        navController.navigate("eventDetail/$eventName")
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
@@ -91,10 +95,8 @@ fun EventDetailScreen() {
     }
 }
 
-
-
 @Composable
-fun EventDetails(eventName: String) {
+fun EventDetails(eventName: String, onClick: () -> Unit) {
     // Display details for a specific event
     val eventImage = getImageResource(eventName)
 
@@ -102,6 +104,7 @@ fun EventDetails(eventName: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick) // Set up clickable behavior
     ) {
         Column(
             modifier = Modifier

@@ -1,5 +1,4 @@
-// NotificationsList.kt
-package com.example.spacehub
+package com.example.spacehub.screen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -9,27 +8,37 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.spacehub.NotificationCardGroup
+import com.example.spacehub.R
+import com.example.spacehub.SpaceNotification
+import com.example.spacehub.runNotificationsFetch
+import com.example.spacehub.showDatePickerDialog
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.util.*
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun NotificationsList() {
+fun NotificationsList(navController: NavController) {
     var startDate by remember { mutableStateOf<LocalDate?>(null) }
     var endDate by remember { mutableStateOf<LocalDate?>(null) }
-    var notificationType by remember { mutableStateOf("all") } // Default to "all"
+    var notificationType by remember { mutableStateOf("all") }
     var result by remember { mutableStateOf("") }
     var notificationsList by remember { mutableStateOf<List<SpaceNotification>?>(null) }
 
@@ -41,11 +50,26 @@ fun NotificationsList() {
 
     var selectedNotificationType by remember { mutableStateOf("Select Notification Type") }
 
+    // Create a boolean to track whether the buttons should be visible or not
+    var buttonsVisible by remember { mutableStateOf(true) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .paint(painterResource(id = R.drawable.night_background), contentScale = ContentScale.FillBounds)
     ) {
+        // Top App Bar
+        TopAppBar(
+            title = { Text("Space Events", color = MaterialTheme.colorScheme.primary) },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Button to show Start Date DatePickerDialog
         Button(
             onClick = {
@@ -57,7 +81,9 @@ fun NotificationsList() {
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
         ) {
             Text(if (startDate != null) "Start Date: ${startDate.toString()}" else "Select Start Date")
         }
@@ -75,7 +101,9 @@ fun NotificationsList() {
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
         ) {
             Text(if (endDate != null) "End Date: ${endDate.toString()}" else "Select End Date")
         }
@@ -86,9 +114,10 @@ fun NotificationsList() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .background(color = Color.Gray, shape = MaterialTheme.shapes.medium)
-                .clickable { expanded = !expanded }
+                .padding(start = 16.dp, end = 16.dp)
+                .background(color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.medium)
+                .clickable { expanded = !expanded },
+            contentAlignment = Alignment.Center
         ) {
             Row(
                 modifier = Modifier
@@ -124,9 +153,7 @@ fun NotificationsList() {
 
         // Display selected notification type
         Spacer(modifier = Modifier.height(16.dp))
-        Text(selectedNotificationType, color = Color.White)
 
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Button click handling
         Button(
@@ -148,11 +175,16 @@ fun NotificationsList() {
                             result = "Error: ${e.message ?: "Unknown error"}"
                         }
                     }
+
+                    // Hide the buttons after submission
+                    buttonsVisible = false
                 } else {
                     result = "Please select both valid start and end dates"
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
         ) {
             Icon(imageVector = Icons.Default.Search, contentDescription = null)
             Spacer(modifier = Modifier.width(4.dp))
@@ -172,13 +204,14 @@ fun NotificationsList() {
                 val uniqueMessageIds = notifications.map { it.messageID }.distinct()
                 for (messageId in uniqueMessageIds) {
                     val filteredNotifications = notifications.filter { it.messageID == messageId }
-                    NotificationCardGroup(notifications = filteredNotifications)
+                    NotificationCardGroup(notifications = filteredNotifications, navController = navController)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
 
         // Display result message
+        Spacer(modifier = Modifier.height(16.dp))
         Text(result)
     }
 }

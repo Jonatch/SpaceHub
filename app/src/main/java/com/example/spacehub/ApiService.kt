@@ -6,33 +6,43 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import com.example.spacehub.SpaceNotification
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Retrofit
+import retrofit2.http.GET
+import retrofit2.http.Query
 
+interface ApiService {
+    @GET("DONKI/notifications")
+    suspend fun getNotifications(
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String,
+        @Query("type") type: String,
+        @Query("api_key") apiKey: String
+    ): List<SpaceNotification>?
+}
 
-private val client = OkHttpClient()
+object ApiClient {
+    private const val BASE_URL = "https://api.nasa.gov/"
+
+    val apiService: ApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
+    }
+}
 
 suspend fun runNotificationsFetch(
     startDate: String,
     endDate: String,
     type: String,
     apiKey: String
-): List<SpaceNotification>? =
-    withContext(Dispatchers.IO) {
-        val url = "https://api.nasa.gov/DONKI/notifications?" +
-                "startDate=$startDate&endDate=$endDate&type=$type&api_key=$apiKey"
-        val request = Request.Builder().url(url).build()
-
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                when (response.code) {
-                    401 -> println("Unauthorized: Check API key")
-                    403 -> println("Forbidden: API key may be invalid or has insufficient permissions")
-                    else -> println("HTTP error code: ${response.code}")
-                }
-                return@withContext null
-            } else {
-                val jsonString = response.body?.string()
-                return@withContext Gson().fromJson(jsonString, Array<SpaceNotification>::class.java).toList()
-            }
-        }
+): List<SpaceNotification>? {
+    return try {
+        ApiClient.apiService.getNotifications(startDate, endDate, type, apiKey)
+    } catch (e: Exception) {
+        println("Error: ${e.message ?: "Unknown error"}")
+        null
     }
+}
