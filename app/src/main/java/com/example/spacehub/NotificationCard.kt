@@ -2,7 +2,10 @@
 package com.example.spacehub
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -30,28 +34,39 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NotificationCardGroup(notifications: List<SpaceNotification>, navController: NavController) {
+fun NotificationCardGroup(
+    notifications: List<SpaceNotification>,
+    navController: NavController,
+    onClick: (SpaceNotification) -> Unit
+) {
     Column {
         for (notification in notifications) {
-            NotificationCard(notification = notification, navController = navController)
+            NotificationCard(notification = notification, navController = navController) {
+                // Call the onClick lambda when the card is clicked
+                onClick(notification)
+            }
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationCard(notification: SpaceNotification, navController: NavController) {
+fun NotificationCard(
+    notification: SpaceNotification,
+    navController: NavController,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable {
-                // Navigate to detail screen
-                navController.navigate("notificationDetail/${notification.messageID}")
-            },
+            .padding(vertical = 8.dp),
+        onClick = onClick // Set the onClick listener for the card
     ) {
         // Display preview of the event
         Column(
@@ -77,26 +92,8 @@ fun NotificationCard(notification: SpaceNotification, navController: NavControll
 }
 
 
-@Composable
-fun NotificationDetailsDialog(notification: SpaceNotification, onDismiss: () -> Unit) {
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(dismissOnClickOutside = true)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text("Message Type: ${notification.messageType}", style = MaterialTheme.typography.bodyMedium)
-            Text("Issue Time: ${notification.messageIssueTime}")
-            Text("Message ID: ${notification.messageId}")
-            Text("Message Body: ${notification.messageBody}")
-            Text("Message URL: ${notification.messageURL}")
 
-            // Add more details as needed
-        }
-    }
-}
+
 
 
 

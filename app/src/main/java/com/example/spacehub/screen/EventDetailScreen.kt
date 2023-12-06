@@ -26,9 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spacehub.R
-import com.example.spacehub.ui.theme.SpaceHubColorPalette
 import com.example.spacehub.ui.theme.SpaceHubTheme
-import com.example.spacehub.ui.theme.StarryBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -104,7 +102,7 @@ fun EventDetails(eventName: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick) // Set up clickable behavior
+//            .clickable(onClick = onClick) // Set up clickable behavior
     ) {
         Column(
             modifier = Modifier

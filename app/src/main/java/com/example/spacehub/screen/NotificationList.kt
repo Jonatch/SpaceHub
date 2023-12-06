@@ -2,6 +2,7 @@ package com.example.spacehub.screen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,12 +18,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.spacehub.NotificationCardGroup
 import com.example.spacehub.R
@@ -53,6 +57,19 @@ fun NotificationsList(navController: NavController) {
     // Create a boolean to track whether the buttons should be visible or not
     var buttonsVisible by remember { mutableStateOf(true) }
 
+    // Track selected notification for the detailed dialog
+    var selectedNotification by remember { mutableStateOf<SpaceNotification?>(null) }
+
+    // Show detailed dialog when a card is clicked
+    if (selectedNotification != null) {
+        Dialog(onDismissRequest = { selectedNotification = null }) {
+            // Create a function to display detailed information
+            DisplayDetailedInfo(notification = selectedNotification!!) {
+                // This lambda will be invoked when the dialog is dismissed
+                selectedNotification = null // You can handle any other actions needed
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -154,7 +171,6 @@ fun NotificationsList(navController: NavController) {
         // Display selected notification type
         Spacer(modifier = Modifier.height(16.dp))
 
-
         // Button click handling
         Button(
             onClick = {
@@ -204,7 +220,10 @@ fun NotificationsList(navController: NavController) {
                 val uniqueMessageIds = notifications.map { it.messageID }.distinct()
                 for (messageId in uniqueMessageIds) {
                     val filteredNotifications = notifications.filter { it.messageID == messageId }
-                    NotificationCardGroup(notifications = filteredNotifications, navController = navController)
+                    NotificationCardGroup(notifications = filteredNotifications, navController = navController) { clickedNotification ->
+                        // Set the selected notification when a card is clicked
+                        selectedNotification = clickedNotification
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -215,3 +234,54 @@ fun NotificationsList(navController: NavController) {
         Text(result)
     }
 }
+
+@Composable
+fun DisplayDetailedInfo(notification: SpaceNotification, onClose: () -> Unit) {
+    // Display detailed information in the dialog
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Event Image
+            val imageResource = com.example.spacehub.getImageResource(notification.messageType)
+            imageResource?.let {
+                Image(
+                    painter = it,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(120.dp)
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(MaterialTheme.colorScheme.background)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Event Type
+            Text("Event Type: ${notification.messageType}", style = MaterialTheme.typography.bodyMedium)
+
+            // Event ID
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Event ID: ${notification.messageID}", style = MaterialTheme.typography.bodyMedium)
+
+            // Issue Time
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Issue Time: ${notification.messageIssueTime}", style = MaterialTheme.typography.bodyMedium)
+
+            // Description
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Description: ${notification.messageBody}", style = MaterialTheme.typography.bodyMedium)
+
+            // Close button
+            Spacer(modifier = Modifier.height(16.dp))
+
+        }
+    }
+}
+

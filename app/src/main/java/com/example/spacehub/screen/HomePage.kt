@@ -2,6 +2,9 @@
 package com.example.spacehub.screen
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -20,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -31,7 +35,8 @@ import com.example.spacehub.ui.theme.SpaceHubTheme
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomePage(navController: NavController) {
-    val events = listOf("Event Details", "Notifications List")
+    val events = listOf("About Each Event", "Find Events")
+    val context: Context = LocalContext.current
 
     SpaceHubTheme {
         Scaffold(
@@ -40,9 +45,10 @@ fun HomePage(navController: NavController) {
                 TopAppBar(
                     title = { Text("Space Hub", color = MaterialTheme.colorScheme.primary) },
                     actions = {
-                        IconButton(onClick = { /* Handle info action */ }) {
+                        IconButton(onClick = { openWebPage("https://ccmc.gsfc.nasa.gov/tools/DONKI/", context) }) {
                             Icon(imageVector = Icons.Default.Info, contentDescription = null)
                         }
+
                     }
                 )
             }
@@ -103,7 +109,7 @@ fun HomeOption(option: String, navController: NavController) {
             Text(
                 text = option,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }
@@ -112,8 +118,18 @@ fun HomeOption(option: String, navController: NavController) {
 fun navigateToScreen(option: String, navController: NavController) {
     // Navigate to the selected screen based on the option
     when (option) {
-        "Event Details" -> navController.navigate("eventDetail")
-        "Notifications List" -> navController.navigate("notificationsList")
+        "About Each Event" -> navController.navigate("eventDetail")
+        "Find Events" -> navController.navigate("notificationsList")
         // Add more options if needed
     }
 }
+
+
+
+fun openWebPage(url: String, context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(intent)
+    }
+}
+
