@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.spacehub.NavScreens
 import com.example.spacehub.R
 import com.example.spacehub.ui.theme.SpaceHubTheme
 
@@ -118,8 +119,8 @@ fun HomeOption(option: String, navController: NavController) {
 fun navigateToScreen(option: String, navController: NavController) {
     // Navigate to the selected screen based on the option
     when (option) {
-        "About Each Event" -> navController.navigate("eventDetail")
-        "Find Events" -> navController.navigate("notificationsList")
+        "About Each Event" -> navController.navigate(NavScreens.Event.route)
+        "Find Events" -> navController.navigate(NavScreens.Info.route)
         // Add more options if needed
     }
 }
