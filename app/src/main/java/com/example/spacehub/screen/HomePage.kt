@@ -46,7 +46,9 @@ fun HomePage(navController: NavController) {
                 TopAppBar(
                     title = { Text("Space Hub", color = MaterialTheme.colorScheme.primary) },
                     actions = {
-                        IconButton(onClick = { openWebPage("https://ccmc.gsfc.nasa.gov/tools/DONKI/", context) }) {
+                        IconButton(onClick = {
+                            openWebPage("https://ccmc.gsfc.nasa.gov/tools/DONKI/", context)
+                        }) {
                             Icon(imageVector = Icons.Default.Info, contentDescription = null)
                         }
 
@@ -128,9 +130,9 @@ fun navigateToScreen(option: String, navController: NavController) {
 
 
 fun openWebPage(url: String, context: Context) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    if (intent.resolveActivity(context.packageManager) != null) {
-        context.startActivity(intent)
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse(url)
     }
+    context.startActivity(intent)
 }
 
