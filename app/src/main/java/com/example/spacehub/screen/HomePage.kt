@@ -121,8 +121,8 @@ fun HomeOption(option: String, navController: NavController) {
 fun navigateToScreen(option: String, navController: NavController) {
     // Navigate to the selected screen based on the option
     when (option) {
-        "About Each Event" -> navController.navigate(NavScreens.Event.route)
-        "Find Events" -> navController.navigate(NavScreens.Info.route)
+        "About Each Event" -> navController.navigate(NavScreens.Info.route)
+        "Find Events" -> navController.navigate(NavScreens.Event.route)
         // Add more options if needed
     }
 }
