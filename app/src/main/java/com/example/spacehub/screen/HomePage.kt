@@ -123,7 +123,6 @@ fun navigateToScreen(option: String, navController: NavController) {
     when (option) {
         "About Each Event" -> navController.navigate(NavScreens.Info.route)
         "Find Events" -> navController.navigate(NavScreens.Event.route)
-        // Add more options if needed
     }
 }
 

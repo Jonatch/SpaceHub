@@ -43,7 +43,7 @@ fun EventDetailScreen(navController: NavController) {
             "MPC",
             "RBE",
             "Report"
-        ) // Add more event names as needed
+        )
     }
 
     SpaceHubTheme {
@@ -102,7 +102,6 @@ fun EventDetails(eventName: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-//            .clickable(onClick = onClick) // Set up clickable behavior
     ) {
         Column(
             modifier = Modifier
@@ -171,8 +170,6 @@ fun getEventExplanation(eventName: String): String {
         "MPC" -> "A magneto pause crossing occurs when a spacecraft passes through the boundary separating Earth's magnetosphere from the solar wind. It provides valuable data about the interactions between the solar wind and Earth's magnetic field."
         "report" -> "A report is a document of all the different space weather phenomenon that are being observed over a reporting period."
         "RBE" -> "Radiation belt enhancement refers to an increase in the concentration of energetic charged particles in Earth's radiation belts. This enhancement can be caused by various solar events and has implications for satellite operations."
-
-        // Add more explanations for other event names
         else -> "This is a brief explanation of the event."
     }
 }

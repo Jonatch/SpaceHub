@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -66,7 +65,7 @@ fun NotificationsList(navController: NavController) {
             // Create a function to display detailed information
             DisplayDetailedInfo(notification = selectedNotification!!) {
                 // This lambda will be invoked when the dialog is dismissed
-                selectedNotification = null // You can handle any other actions needed
+                selectedNotification = null
             }
         }
     }
@@ -180,7 +179,6 @@ fun NotificationsList(navController: NavController) {
 
                     coroutineScope.launch {
                         try {
-                            // Update the function call to use SpaceNotification instead of Notification
                             notificationsList = runNotificationsFetch(startDate.toString(), endDate.toString(), notificationType, apiKey)
                             result = if (notificationsList != null) {
                                 "Notifications fetched successfully"

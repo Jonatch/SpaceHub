@@ -3,35 +3,20 @@ package com.example.spacehub.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.example.spacehub.R
-import com.example.spacehub.ui.theme.SpaceHubTheme
-import kotlin.math.roundToInt
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF001F3F), // Dark Blue
@@ -47,7 +32,7 @@ private val LightColorScheme = lightColorScheme(
 
 // In SpaceHubTheme file
 object SpaceHubColorPalette {
-    val SpaceBackground = Color(0xFF000080) // Navy Blue background, you can adjust the color
+    val SpaceBackground = Color(0xFF000080)
     val StarColor = Color.White
 }
 
@@ -55,7 +40,6 @@ object SpaceHubColorPalette {
 @Composable
 fun SpaceHubTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
