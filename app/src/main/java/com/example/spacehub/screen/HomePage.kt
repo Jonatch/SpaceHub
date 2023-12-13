@@ -1,4 +1,3 @@
-// HomePage.kt
 package com.example.spacehub.screen
 
 import android.annotation.SuppressLint
@@ -57,7 +56,6 @@ fun HomePage(navController: NavController) {
             }
         )
         {
-            // Use LazyColumn with StarryBackground
             LazyColumn(
                 modifier = Modifier
                     .paint(painterResource(id = R.drawable.night_background), contentScale = ContentScale.FillBounds)
@@ -70,7 +68,6 @@ fun HomePage(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Display welcome message and app summary
                         Text(
                             text = "Welcome to Space Hub!",
                             style = MaterialTheme.typography.bodyLarge,
@@ -85,7 +82,6 @@ fun HomePage(navController: NavController) {
                     }
                 }
                 items(events) { event ->
-                    // Display options to navigate to Event Details or Notifications List
                     HomeOption(event, navController)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -119,7 +115,6 @@ fun HomeOption(option: String, navController: NavController) {
 }
 
 fun navigateToScreen(option: String, navController: NavController) {
-    // Navigate to the selected screen based on the option
     when (option) {
         "About Each Event" -> navController.navigate(NavScreens.Info.route)
         "Find Events" -> navController.navigate(NavScreens.Event.route)

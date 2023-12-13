@@ -1,4 +1,3 @@
-// NotificationCard.kt
 package com.example.spacehub
 
 import android.os.Build
@@ -31,7 +30,6 @@ fun NotificationCardGroup(
     Column {
         for (notification in notifications) {
             NotificationCard(notification = notification, navController = navController) {
-                // Call the onClick lambda when the card is clicked
                 onClick(notification)
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -77,12 +75,6 @@ fun NotificationCard(
         }
     }
 }
-
-
-
-
-
-
 
 @Composable
 fun getImageResource(messageType: String): Painter? {

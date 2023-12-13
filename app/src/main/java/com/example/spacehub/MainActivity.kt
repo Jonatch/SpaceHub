@@ -1,4 +1,3 @@
-// MainActivity.kt
 package com.example.spacehub
 
 import android.os.Build
@@ -16,7 +15,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SpaceHubTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {

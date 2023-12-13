@@ -30,13 +30,13 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Color(0xFF9E7FFF)  // Nebula Purple
 )
 
-// In SpaceHubTheme file
+
 object SpaceHubColorPalette {
     val SpaceBackground = Color(0xFF000080)
     val StarColor = Color.White
 }
 
-// In the SpaceHubTheme file
+
 @Composable
 fun SpaceHubTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

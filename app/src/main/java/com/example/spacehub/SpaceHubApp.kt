@@ -1,4 +1,3 @@
-// SpaceHubApp.kt
 package com.example.spacehub
 
 import android.annotation.SuppressLint

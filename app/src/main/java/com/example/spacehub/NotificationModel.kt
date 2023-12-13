@@ -1,4 +1,3 @@
-// NotificationModel.kt
 package com.example.spacehub
 
 data class Notification(

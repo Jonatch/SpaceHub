@@ -62,9 +62,7 @@ fun NotificationsList(navController: NavController) {
     // Show detailed dialog when a card is clicked
     if (selectedNotification != null) {
         Dialog(onDismissRequest = { selectedNotification = null }) {
-            // Create a function to display detailed information
             DisplayDetailedInfo(notification = selectedNotification!!) {
-                // This lambda will be invoked when the dialog is dismissed
                 selectedNotification = null
             }
         }
@@ -126,7 +124,6 @@ fun NotificationsList(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Notification Type dropdown
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -167,15 +164,12 @@ fun NotificationsList(navController: NavController) {
             }
         }
 
-        // Display selected notification type
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Button click handling
         Button(
             onClick = {
-                // Check if both start and end dates are selected and end date is not before start date
                 if (startDate != null && endDate != null && endDate!! >= startDate!!) {
-                    val apiKey = "PzCNkrm4dtZGYZS4EyBajyzbFROa4hbM109iqME5" // Replace with your actual API key
+                    val apiKey = "PzCNkrm4dtZGYZS4EyBajyzbFROa4hbM109iqME5"
 
                     coroutineScope.launch {
                         try {
@@ -190,7 +184,6 @@ fun NotificationsList(navController: NavController) {
                         }
                     }
 
-                    // Hide the buttons after submission
                     buttonsVisible = false
                 } else {
                     result = "Please select both valid start and end dates"
@@ -207,7 +200,6 @@ fun NotificationsList(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display notifications in a scrollable column
         notificationsList?.let { notifications ->
             Column(
                 modifier = Modifier
@@ -219,7 +211,6 @@ fun NotificationsList(navController: NavController) {
                 for (messageId in uniqueMessageIds) {
                     val filteredNotifications = notifications.filter { it.messageID == messageId }
                     NotificationCardGroup(notifications = filteredNotifications, navController = navController) { clickedNotification ->
-                        // Set the selected notification when a card is clicked
                         selectedNotification = clickedNotification
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -227,7 +218,6 @@ fun NotificationsList(navController: NavController) {
             }
         }
 
-        // Display result message
         Spacer(modifier = Modifier.height(16.dp))
         Text(result)
     }
@@ -235,7 +225,6 @@ fun NotificationsList(navController: NavController) {
 
 @Composable
 fun DisplayDetailedInfo(notification: SpaceNotification, onClose: () -> Unit) {
-    // Display detailed information in the dialog
     Dialog(
         onDismissRequest = onClose,
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
@@ -246,7 +235,6 @@ fun DisplayDetailedInfo(notification: SpaceNotification, onClose: () -> Unit) {
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Event Image
             val imageResource = com.example.spacehub.getImageResource(notification.messageType)
             imageResource?.let {
                 Image(
@@ -261,22 +249,17 @@ fun DisplayDetailedInfo(notification: SpaceNotification, onClose: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Event Type
             Text("Event Type: ${notification.messageType}", style = MaterialTheme.typography.bodyMedium)
 
-            // Event ID
             Spacer(modifier = Modifier.height(8.dp))
             Text("Event ID: ${notification.messageID}", style = MaterialTheme.typography.bodyMedium)
 
-            // Issue Time
             Spacer(modifier = Modifier.height(8.dp))
             Text("Issue Time: ${notification.messageIssueTime}", style = MaterialTheme.typography.bodyMedium)
 
-            // Description
             Spacer(modifier = Modifier.height(8.dp))
             Text("Description: ${notification.messageBody}", style = MaterialTheme.typography.bodyMedium)
 
-            // Close button
             Spacer(modifier = Modifier.height(16.dp))
 
         }

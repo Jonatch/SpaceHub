@@ -3,7 +3,6 @@ package com.example.spacehub.screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,7 +31,6 @@ import com.example.spacehub.ui.theme.SpaceHubTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun EventDetailScreen(navController: NavController) {
-    // Use a list to store the names of all events
     val eventNames = remember {
         listOf(
             "FLR",
@@ -66,7 +64,6 @@ fun EventDetailScreen(navController: NavController) {
             }
         )
         {
-            // Use LazyColumn with StarryBackground
             LazyColumn(
                 modifier = Modifier
                     .paint(painterResource(id = R.drawable.night_background), contentScale = ContentScale.FillBounds)
@@ -81,9 +78,7 @@ fun EventDetailScreen(navController: NavController) {
                     }
                 }
                 items(eventNames) { eventName ->
-                    // Display details for each event in the list within a card
                     EventDetails(eventName) {
-                        // Navigate to detail screen when clicked
                         navController.navigate("eventDetail/$eventName")
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -160,7 +155,6 @@ fun getImageResource(eventName: String): Painter? {
 
 @Composable
 fun getEventExplanation(eventName: String): String {
-    // Retrieve event explanation based on the event name
     return when (eventName) {
         "FLR" -> "A solar flare is a sudden, intense burst of energy on the Sun's surface, releasing a tremendous amount of radiation. Solar flares can impact radio communications and navigation systems."
         "SEP" -> "Solar energetic particles are high-energy charged particles ejected from the Sun during solar flares and CMEs. These particles can pose a threat to astronauts in space and affect satellite operations."
