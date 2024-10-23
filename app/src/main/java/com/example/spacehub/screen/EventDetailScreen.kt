@@ -83,6 +83,9 @@ fun EventDetailScreen(navController: NavController) {
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+                item{
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
     }
